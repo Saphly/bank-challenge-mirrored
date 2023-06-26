@@ -4,6 +4,92 @@ This challenge helps you practice your OO design skills.
 
 You'll work alone, and you'll also review your own code so you can practice reflecting on and improving your own work.
 
+## Explanation
+
+As a bank client, 
+To keep my money in a safe place,
+I want to deposit my money into my bank account. 
+
+| Objects | Properties      | Messages  | Output |
+| ------- | --------------- | --------- | ------ |
+| Account | balance @number | deposit() |        |
+|         |                 |           |        |
+
+As a bank client, 
+So that I can have cash on hand,
+I want to withdraw money from my bank account.
+
+| Objects | Properties      | Messages   | Output |
+| ------- | --------------- | ---------- | ------ |
+| Account | balance @number | withdraw() |        |
+
+As a bank client, 
+So that I know when I deposit,
+I want my deposit transactions to be recorded. 
+
+<!-- Do i need a Date object? -->
+
+| Objects     | Properties                        | Messages  | Output  |
+| ----------- | --------------------------------- | --------- | ------- |
+| Account     | balance @number                   | deposit() |         |
+|             | transactions @array[@Transaction] |           |         |
+| Transaction | date @Date                        | create()  | @object |
+|             | balance @number                   |           |         |
+|             | depositAmount @number             |           |         |
+
+As a bank client,
+So that I know when I withdraw, 
+I want my withdraw transactions to be recorded. 
+
+| Objects     | Properties                        | Messages   | Output  |
+| ----------- | --------------------------------- | ---------- | ------- |
+| Account     | balance @number                   | withdraw() |         |
+|             | transactions @array[@Transaction] |            |         |
+| Transaction | date @Date                        | create()   | @object |
+|             | balance @number                   |            |         |
+|             | withdrawAmount @number            |            |         |
+
+As a bank client,
+To know more about my transactions,
+I want to be able to see my transaction details. 
+
+| Objects   | Properties                        | Messages | Output |
+| --------- | --------------------------------- | -------- | ------ |
+| Account   | transactions @array[@Transaction] |          |        |
+| Statement | account @Account                  | @print   |        |
+
+As a bank client,
+So that I can read easily,
+I want the bank statement to be printed neatly.
+
+| Objects   | Properties                        | Messages | Output |
+| --------- | --------------------------------- | -------- | ------ |
+| Account   | transactions @array[@Transaction] |          |        |
+| Statement | account @Account                  | @print   |        |
+|           |                                   | @format  |        |
+
+As a blient, so that i cna know the lates status of finances, i would like to see my latest balance
+As a client, so that i can view my trx history in a given time period, I want to be able to see a bank statement for the specified time range.
+
+
+## Installation
+Use the package manager [npm](https://docs.npmjs.com/cli/v9/commands/npm-install) to install dependencies.
+```
+npm install
+```
+
+## To run the tests
+After installing the dependencies, you can run the test suites from your project root directory: 
+```
+npm test
+```
+
+## Usage
+You can run the programme from the project root directory by using
+```
+node index.js
+```
+
 ## Specification
 
 ### Requirements

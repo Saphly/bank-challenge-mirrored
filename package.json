@@ -1,0 +1,17 @@
+{
+  "name": "bank-challenge",
+  "version": "1.0.0",
+  "description": "An OOP Challenge for Digital Futures",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "author": "saphly",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.43.0",
+    "jasmine": "^5.0.2",
+    "prettier": "^2.8.8"
+  }
+}
