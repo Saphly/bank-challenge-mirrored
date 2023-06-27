@@ -27,7 +27,6 @@ As a bank client,
 So that I know when I deposit,
 I want my deposit transactions to be recorded. 
 
-<!-- Do i need a Date object? -->
 
 | Objects     | Properties                        | Messages  | Output  |
 | ----------- | --------------------------------- | --------- | ------- |
