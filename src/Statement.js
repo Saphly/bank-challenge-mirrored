@@ -101,24 +101,19 @@ class Statement {
     };
 
     static getTransactionBalance = (accountBalance, sortedTransactions) => {
-        let balanceArr = [];
         let remainingBalance = accountBalance;
 
-        for (let i = 0; i < sortedTransactions.length; i++) {
-            if (i === 0) {
-                balanceArr = [...balanceArr, accountBalance];
-                continue;
-            }
-
-            if (sortedTransactions[i].type === 'DEBIT') {
-                remainingBalance -= sortedTransactions[i - 1].amount;
-            } else {
-                remainingBalance += sortedTransactions[i - 1].amount;
-            }
-            balanceArr = [...balanceArr, remainingBalance];
-        }
-
-        return balanceArr;
+        return sortedTransactions.slice(0, -1).reduce(
+            (balances, transaction) => {
+                if (transaction.type === 'DEBIT') {
+                    remainingBalance += transaction.amount;
+                } else {
+                    remainingBalance -= transaction.amount;
+                }
+                return [...balances, remainingBalance];
+            },
+            [remainingBalance]
+        );
     };
 
     // Implemented from
@@ -133,16 +128,12 @@ class Statement {
         return sortedArray;
     };
 
-    static formatDate = (dateObj) => {
-        let day = dateObj.getDate();
-        let month = dateObj.getMonth() + 1;
-        let year = dateObj.getFullYear();
-
-        let formattedDay = day < 10 ? `0${day}` : day;
-        let formattedMonth = month < 10 ? `0${month}` : month;
-
-        return `${formattedDay}/${formattedMonth}/${year}`;
-    };
+    static formatDate = (dateObj) =>
+        dateObj.toLocaleString('en-GB', {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+        });
 
     // Not enough time to make it dynamic
     static getColumnWidth = () => {

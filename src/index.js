@@ -1,21 +1,18 @@
+import Account from './Account.js';
 import Statement from './Statement.js';
-const mockAccount = {
-    currentBalance: 2400,
-    transactions: [
-        { timestamp: new Date('2021-01-10'), amount: 400, type: 'CREDIT' },
-        { timestamp: new Date('2021-01-20'), amount: 1000, type: 'DEBIT' },
-        { timestamp: new Date('2021-01-25'), amount: 3000, type: 'CREDIT' },
-    ],
-};
 
-// Statement.printHeader();
-// Statement.formatDate(new Date('2012-01-08'));
-// Statement.print(mockAccount);
-// Statement.sortTransactions(mockAccount.transactions);
-// Statement.formatTransactions(5000, [
-//     { timestamp: new Date('2021-01-10'), amount: 400, type: 'CREDIT' },
-//     { timestamp: new Date('2021-01-20'), amount: 1000, type: 'DEBIT' },
-//     { timestamp: new Date('2021-01-25'), amount: 3000, type: 'CREDIT' },
-// ]);
+console.log('Steph opens a new bank account.\n');
+const stephAccount = new Account();
 
-Statement.print(mockAccount);
+console.log('Steph then deposits GBP 1,000 into the account on 10/01/2012.');
+stephAccount.deposit(new Date('2012-01-10'), 1000);
+
+console.log(
+    'Steph deposits another GBP 2,000 into the account three days later on 13/01/2012.'
+);
+stephAccount.deposit(new Date('2012-01-13'), 2000);
+
+console.log('She then withdrew GBP 500 the next day.');
+stephAccount.withdraw(new Date('2012-01-14'), 500);
+
+Statement.print(stephAccount);
