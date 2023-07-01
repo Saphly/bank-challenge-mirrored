@@ -44,24 +44,18 @@ class Transaction {
         this.#type = transactionType;
     }
 
-    // setDate = (dateString) => {
-    //     this.timestamp = new Date(dateString);
-    // };
+    // Implemented from
+    // https://stackoverflow.com/questions/17369098/simplest-way-of-getting-the-number-of-decimals-in-a-number-in-javascript
+    countDecimals = (amount) => {
+        if (Math.floor(amount) === amount) return 0;
 
-    checkAmount = (amount) => {
-        if (isNaN(amount) || amount < 0) throw this.#amountError;
+        return amount.toString().split('.')[1].length;
     };
 
-    // setAmount = (amount) => {
-    //     this.checkAmount(amount);
-    //     this.amount = amount;
-    // };
-
-    // setType = (typeString) => {
-    //     if (!['DEBIT', 'CREDIT'].includes(typeString)) throw this.#typeError;
-
-    //     this.type = typeString;
-    // };
+    checkAmount = (amount) => {
+        if (isNaN(amount) || amount <= 0 || this.countDecimals(amount) > 2)
+            throw this.#amountError;
+    };
 }
 
 export default Transaction;

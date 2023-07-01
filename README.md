@@ -18,8 +18,6 @@ I want to deposit my money into my bank account.
 
 Tests:
 <ul>
-    <li>Check deposit amount is not more than 2 decimal places</li>
-    <li>Check deposit amount is not less than 0</li>
     <li>Check that deposit amount gets added to balance</li>
 </ul>
 
@@ -35,10 +33,6 @@ I want to withdraw money from my bank account.
 
 Tests:
 <ul>
-<!-- since balance can be negative, no need to check?  -->
-    <li>Check that withdraw amount does not exceed balance</li>
-    <li>Check withdraw amount is not more than 2 decimal places</li>
-    <li>Check withdraw amount is not less than 0</li>
     <li>Check new balance is correct after withdrawing</li>
 </ul>
 
@@ -48,19 +42,20 @@ As a bank client,
 So that I know when I deposit,
 I want my deposit transactions to be recorded. 
 
-| Objects     | Properties                        | Messages        | Output  |
-| ----------- | --------------------------------- | --------------- | ------- |
-| Account     | balance @number                   | deposit()       |         |
-|             | transactions @array[@Transaction] |                 |         |
-| Transaction | date @Date                        |                 | @object |
-| <!--        |                                   | balance @number |         |  | --> |
-|             | depositAmount @number             |                 |         |
-|             | type @string                      |                 |         |
+| Objects     | Properties                        | Messages  | Output  |
+| ----------- | --------------------------------- | --------- | ------- |
+| Account     | balance @number                   | deposit() |         |
+|             | transactions @array[@Transaction] |           |         |
+| Transaction | timestamp @Date                   |           | @object |
+|             | amount @number                    |           |         |
+|             | type @string                      |           |         |
 
 Tests:
 <ul>
     <li>Check that date is valid</li>
-    <li>Check that amount is a number</li>
+    <li>Check that deposit/withdraw amount is a number</li>
+    <li>Check deposit/withdraw amount is not more than 2 decimal places</li>
+    <li>Check deposit/withdraw amount is not less than 0</li>
     <li>Check that type is either "DEBIT" or "CREDIT"</li>
     <li>Check that it should return error if any of the args are invalid</li>
     <li>Check that transactions[] has added a Transaction{} after successful deposit</li>
@@ -76,9 +71,9 @@ I want my withdraw transactions to be recorded.
 | ----------- | --------------------------------- | ---------- | ------- |
 | Account     | balance @number                   | withdraw() |         |
 |             | transactions @array[@Transaction] |            |         |
-| Transaction | date @Date                        |            | @object |
-|             | balance @number                   |            |         |
-|             | withdrawAmount @number            |            |         |
+| Transaction | timestamp @Date                   |            | @object |
+|             | amount @number                    |            |         |
+|             | type @string                      |            |         |
 
 Tests:
 <ul>

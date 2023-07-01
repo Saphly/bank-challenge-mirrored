@@ -2,6 +2,7 @@ import Account from '../src/Account.js';
 
 describe('Account Class Tests', () => {
     let account;
+    const testDate = new Date('10/01/2012');
 
     beforeEach(() => {
         account = new Account();
@@ -20,22 +21,35 @@ describe('Account Class Tests', () => {
     describe('When deposit into account', () => {
         it('should return an error when the deposit amount is more than 2 decimal places', () => {
             expect(() => {
-                account.deposit(10.309);
-            }).toThrowError('Amount can only be up to 2 decimal places');
+                account.deposit(testDate, 10.309);
+            }).toThrowError('Invalid amount');
             expect(account.currentBalance).toBe(0);
         });
 
         it('should return an error if deposit amount is less than 0', () => {
             expect(() => {
-                account.deposit(-5);
-            }).toThrowError('Amount has to be more than 0');
+                account.deposit(testDate, -5);
+            }).toThrowError('Invalid amount');
+            expect(account.currentBalance).toBe(0);
+        });
+
+        it('should return an error when the deposit date is invalid', () => {
+            expect(() => {
+                account.deposit('42/01/2021', 1000);
+            }).toThrowError('Invalid date');
             expect(account.currentBalance).toBe(0);
         });
 
         it('should add to the account balance when deposit 1000', () => {
-            account.deposit(1000);
+            account.deposit(testDate, 1000);
 
             expect(account.currentBalance).toBe(1000);
+        });
+
+        it('should check that the transaction is recorded after a successful deposit', () => {
+            account.deposit(testDate, 500);
+
+            expect(account.transactions.at(-1).amount).toBe(500);
         });
     });
 
@@ -49,25 +63,36 @@ describe('Account Class Tests', () => {
 
         it('should return an error when the withdraw amount is more than 2 decimal places', () => {
             expect(() => {
-                account.withdraw(10.309);
-            }).toThrowError('Amount can only be up to 2 decimal places');
+                account.withdraw(testDate, 10.309);
+            }).toThrowError('Invalid amount');
             expect(account.currentBalance).toBe(0);
         });
 
         it('should return an error if withdraw amount is less than 0', () => {
             expect(() => {
-                account.withdraw(-5);
-            }).toThrowError('Amount has to be more than 0');
+                account.withdraw(testDate, -5);
+            }).toThrowError('Invalid amount');
             expect(account.currentBalance).toBe(0);
         });
 
         it('should withdraw from account balance provided there is sufficient balance', () => {
             expect(account.currentBalance).toBe(0);
-            account.deposit(1000);
+            account.deposit(testDate, 1000);
             expect(account.currentBalance).toBe(1000);
 
-            account.withdraw(200);
+            account.withdraw(testDate, 200);
             expect(account.currentBalance).toBe(800);
+        });
+
+        it('should check that the transaction is recorded after a successful withdraw', () => {
+            expect(account.currentBalance).toBe(0);
+            account.deposit(testDate, 1000);
+            expect(account.currentBalance).toBe(1000);
+
+            account.withdraw(testDate, 200);
+            expect(account.currentBalance).toBe(800);
+
+            expect(account.transactions.at(-1).amount).toBe(200);
         });
     });
 });

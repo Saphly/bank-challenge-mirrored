@@ -31,6 +31,12 @@ describe('Transaction Class Tests', () => {
             );
         });
 
+        it('should return an error if amount more than 2 decimal places', () => {
+            expect(
+                () => new Transaction(firstDate, 10.1223, 'CREDIT')
+            ).toThrowError('Invalid amount');
+        });
+
         it('should return an error if amount is less than 0', () => {
             expect(() => new Transaction(firstDate, -5)).toThrowError(
                 'Invalid amount'
