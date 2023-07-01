@@ -44,12 +44,16 @@ class Statement {
     };
 
     static formatTransactions = (balanceArray, sortedTransactions) => {
+        const RESET_ANSI = '\x1b[0m';
+        const RED_ANSI = '\x1b[0;31m';
+        const GREEN_ANSI = '\x1b[0;32m';
         const colWidths = this.getColumnWidth();
         let formattedTransactions = [];
 
         for (let i = 0; i < sortedTransactions.length; i++) {
             let transaction = sortedTransactions[i];
             let transactionString = '';
+            let balanceColour = balanceArray[i] >= 0 ? GREEN_ANSI : RED_ANSI;
 
             transactionString = this.formatDate(transaction.timestamp)
                 .padEnd(colWidths.dateColumn)
@@ -62,16 +66,16 @@ class Statement {
                 );
 
                 transactionString = transactionString.concat(
+                    RED_ANSI,
                     transaction.amount.toFixed(2).padEnd(colWidths.others),
+                    RESET_ANSI,
                     this.colSeparator
-                );
-
-                transactionString = transactionString.concat(
-                    balanceArray[i].toFixed(2)
                 );
             } else {
                 transactionString = transactionString.concat(
+                    GREEN_ANSI,
                     transaction.amount.toFixed(2).padEnd(colWidths.others),
+                    RESET_ANSI,
                     this.colSeparator
                 );
 
@@ -79,11 +83,14 @@ class Statement {
                     ''.padEnd(colWidths.others),
                     this.colSeparator
                 );
-
-                transactionString = transactionString.concat(
-                    balanceArray[i].toFixed(2)
-                );
             }
+
+            transactionString = transactionString.concat(
+                balanceColour,
+                balanceArray[i].toFixed(2),
+                RESET_ANSI
+            );
+
             formattedTransactions = [
                 ...formattedTransactions,
                 transactionString,
@@ -137,7 +144,7 @@ class Statement {
         return `${formattedDay}/${formattedMonth}/${year}`;
     };
 
-    // Not sure how to set it to have widest/dynamic widths
+    // Not enough time to make it dynamic
     static getColumnWidth = () => {
         return {
             dateColumn: '10/10/2021'.length,

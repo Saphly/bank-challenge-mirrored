@@ -12,7 +12,7 @@ describe('Statement Class Tests', () => {
         ],
     };
 
-    describe('Print', () => {
+    describe('When printing', () => {
         beforeEach(() => {
             consoleLogSpy = spyOn(console, 'log');
             printHeaderSpy = spyOn(Statement, 'printHeader');
@@ -39,30 +39,51 @@ describe('Statement Class Tests', () => {
         });
     });
 
-    describe('Format Transactions', () => {
-        let sortedTransactions;
-        beforeEach(() => {
-            sortedTransactions = Statement.sortTransactions(
+    describe('When calculating balance for each transaction', () => {
+        it('should get account current balance for latest transaction', () => {
+            let sortedTransactions = Statement.sortTransactions(
                 mockAccount.transactions
             );
-        });
 
-        it('should get balance for each transaction', () => {
             let balanceArr = Statement.getTransactionBalance(
                 mockAccount.currentBalance,
                 sortedTransactions
             );
 
             expect(balanceArr[0]).toBe(mockAccount.currentBalance);
-            expect(balanceArr.at(-1)).toBe(400);
         });
 
-        it('should return array of strings', () => {
+        it('should get oldest transaction amount as oldest transaction balance', () => {
+            let sortedTransactions = Statement.sortTransactions(
+                mockAccount.transactions
+            );
+
             let balanceArr = Statement.getTransactionBalance(
                 mockAccount.currentBalance,
                 sortedTransactions
             );
 
+            expect(balanceArr.at(-1)).toBe(sortedTransactions.at(-1).amount);
+        });
+    });
+
+    describe('When formatting transactions array', () => {
+        const RED_ANSI = '\x1b[0;31m';
+        const GREEN_ANSI = '\x1b[0;32m';
+        let sortedTransactions, balanceArr;
+
+        beforeEach(() => {
+            sortedTransactions = Statement.sortTransactions(
+                mockAccount.transactions
+            );
+
+            balanceArr = Statement.getTransactionBalance(
+                mockAccount.currentBalance,
+                sortedTransactions
+            );
+        });
+
+        it('should return array of strings', () => {
             let formattedArr = Statement.formatTransactions(
                 balanceArr,
                 sortedTransactions
@@ -71,9 +92,19 @@ describe('Statement Class Tests', () => {
             expect(formattedArr.length).toBe(mockAccount.transactions.length);
             expect(formattedArr[0]).toContain('2400');
         });
+
+        it('should return formatted strings with ANSI colour code', () => {
+            let formattedArr = Statement.formatTransactions(
+                balanceArr,
+                sortedTransactions
+            );
+
+            expect(formattedArr[0]).toContain(GREEN_ANSI);
+            expect(formattedArr[1]).toContain(RED_ANSI);
+        });
     });
 
-    describe('Sort Transactions', () => {
+    describe('When sorting transactions', () => {
         it('should sort transaction to be newest to oldest transactions', () => {
             let sortedArr = Statement.sortTransactions(
                 mockAccount.transactions
@@ -82,7 +113,7 @@ describe('Statement Class Tests', () => {
         });
     });
 
-    describe('Print Header', () => {
+    describe('When printing the header', () => {
         beforeEach(() => {
             consoleLogSpy = spyOn(console, 'log');
         });
