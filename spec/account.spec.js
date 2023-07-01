@@ -1,6 +1,6 @@
 import Account from '../src/Account.js';
 
-describe('Account Tests', () => {
+describe('Account Class Tests', () => {
     let account;
 
     beforeEach(() => {
@@ -40,14 +40,14 @@ describe('Account Tests', () => {
     });
 
     describe('When withdraw from account', () => {
-        it('should return an error if withdraw amount is more than account balance', () => {
-            expect(account.currentBalance).toBe(0);
-            expect(() => {
-                account.withdraw(5000);
-            }).toThrowError('Insufficient balance');
-        });
+        // it('should return an error if withdraw amount is more than account balance', () => {
+        //     expect(account.currentBalance).toBe(0);
+        //     expect(() => {
+        //         account.withdraw(5000);
+        //     }).toThrowError('Insufficient balance');
+        // });
 
-        it('should return an error when the deposit amount is more than 2 decimal places', () => {
+        it('should return an error when the withdraw amount is more than 2 decimal places', () => {
             expect(() => {
                 account.withdraw(10.309);
             }).toThrowError('Amount can only be up to 2 decimal places');

@@ -6,6 +6,8 @@ You'll work alone, and you'll also review your own code so you can practice refl
 
 ## Explanation
 
+### User story 1
+
 As a bank client, 
 To keep my money in a safe place,
 I want to deposit my money into my bank account. 
@@ -13,7 +15,15 @@ I want to deposit my money into my bank account.
 | Objects | Properties      | Messages  | Output |
 | ------- | --------------- | --------- | ------ |
 | Account | balance @number | deposit() |        |
-|         |                 |           |        |
+
+Tests:
+<ul>
+    <li>Check deposit amount is not more than 2 decimal places</li>
+    <li>Check deposit amount is not less than 0</li>
+    <li>Check that deposit amount gets added to balance</li>
+</ul>
+
+### User story 2
 
 As a bank client, 
 So that I can have cash on hand,
@@ -23,18 +33,40 @@ I want to withdraw money from my bank account.
 | ------- | --------------- | ---------- | ------ |
 | Account | balance @number | withdraw() |        |
 
+Tests:
+<ul>
+<!-- since balance can be negative, no need to check?  -->
+    <li>Check that withdraw amount does not exceed balance</li>
+    <li>Check withdraw amount is not more than 2 decimal places</li>
+    <li>Check withdraw amount is not less than 0</li>
+    <li>Check new balance is correct after withdrawing</li>
+</ul>
+
+### User story 3
+
 As a bank client, 
 So that I know when I deposit,
 I want my deposit transactions to be recorded. 
 
+| Objects     | Properties                        | Messages        | Output  |
+| ----------- | --------------------------------- | --------------- | ------- |
+| Account     | balance @number                   | deposit()       |         |
+|             | transactions @array[@Transaction] |                 |         |
+| Transaction | date @Date                        |                 | @object |
+| <!--        |                                   | balance @number |         |  | --> |
+|             | depositAmount @number             |                 |         |
+|             | type @string                      |                 |         |
 
-| Objects     | Properties                        | Messages  | Output  |
-| ----------- | --------------------------------- | --------- | ------- |
-| Account     | balance @number                   | deposit() |         |
-|             | transactions @array[@Transaction] |           |         |
-| Transaction | date @Date                        | create()  | @object |
-|             | balance @number                   |           |         |
-|             | depositAmount @number             |           |         |
+Tests:
+<ul>
+    <li>Check that date is valid</li>
+    <li>Check that amount is a number</li>
+    <li>Check that type is either "DEBIT" or "CREDIT"</li>
+    <li>Check that it should return error if any of the args are invalid</li>
+    <li>Check that transactions[] has added a Transaction{} after successful deposit</li>
+</ul>
+
+### User story 4
 
 As a bank client,
 So that I know when I withdraw, 
@@ -44,9 +76,16 @@ I want my withdraw transactions to be recorded.
 | ----------- | --------------------------------- | ---------- | ------- |
 | Account     | balance @number                   | withdraw() |         |
 |             | transactions @array[@Transaction] |            |         |
-| Transaction | date @Date                        | create()   | @object |
+| Transaction | date @Date                        |            | @object |
 |             | balance @number                   |            |         |
 |             | withdrawAmount @number            |            |         |
+
+Tests:
+<ul>
+    <li>Check that transactions[] has added a Transaction{} after successful withdraw</li>
+</ul>
+
+### User story 5
 
 As a bank client,
 To know more about my transactions,
@@ -56,6 +95,14 @@ I want to be able to see my transaction details.
 | --------- | --------------------------------- | -------- | ------ |
 | Account   | transactions @array[@Transaction] |          |        |
 | Statement | account @Account                  | @print   |        |
+
+Tests: 
+<ul>
+    <li>Check that it prints the header</li>
+    <li>Check that it is printing the right elements</li>
+</ul>
+
+### User story 6
 
 As a bank client,
 So that I can read easily,
@@ -67,8 +114,12 @@ I want the bank statement to be printed neatly.
 | Statement | account @Account                  | @print   |        |
 |           |                                   | @format  |        |
 
-As a blient, so that i cna know the lates status of finances, i would like to see my latest balance
-As a client, so that i can view my trx history in a given time period, I want to be able to see a bank statement for the specified time range.
+Tests: 
+<ul>
+    <li>Check that it has the right paddings</li>
+    <li>Check that it has the right colours for debit and credit amount</li>
+</ul>
+
 
 
 ## Installation
