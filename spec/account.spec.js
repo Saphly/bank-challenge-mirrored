@@ -2,7 +2,7 @@ import Account from '../src/Account.js';
 
 describe('Account Class Tests', () => {
     let account;
-    const testDate = new Date('10/01/2012');
+    const testDate = new Date('2012-01-10');
 
     beforeEach(() => {
         account = new Account();
@@ -93,6 +93,20 @@ describe('Account Class Tests', () => {
             expect(account.currentBalance).toBe(800);
 
             expect(account.transactions.at(-1).amount).toBe(200);
+        });
+    });
+
+    describe('When request to view bank account statement', () => {
+        let consoleLogSpy;
+
+        beforeEach(() => {
+            consoleLogSpy = spyOn(console, 'log');
+        });
+
+        it('should console log transaction', () => {
+            account.deposit(testDate, 10000);
+            account.printStatement(account);
+            expect(consoleLogSpy).toHaveBeenCalled();
         });
     });
 });

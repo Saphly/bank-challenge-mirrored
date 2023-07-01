@@ -1,3 +1,4 @@
+import Statement from './Statement.js';
 import Transaction from './Transaction.js';
 
 class Account {
@@ -36,6 +37,10 @@ class Account {
 
         this.currentBalance -= withdrawAmount;
         this.transactions = [...this.transactions, newTransaction];
+    };
+
+    printStatement = () => {
+        Statement.print(this);
     };
 }
 

@@ -2,24 +2,20 @@ import Transaction from '../src/Transaction.js';
 
 describe('Transaction Class Tests', () => {
     let transaction;
-    const firstDate = new Date('10/01/2023');
-
-    beforeEach(() => {
-        transaction = new Transaction(firstDate, 5, 'CREDIT');
-    });
+    const firstDate = new Date('2012-01-10');
 
     describe('Transaction instantiation tests', () => {
         // it has to be this specific format
         it('should return an error if given invalid date', () => {
             expect(
-                () => new Transaction(new Date('43/01/2023'), 5)
+                () => new Transaction(new Date('2023-01-43'), 5)
             ).toThrowError('Invalid date');
         });
 
         it('should instantiate with a date', () => {
             // jasmine.clock().install();
             // let mockDate = jasmine.clock().mockDate(new Date(firstDate));
-
+            transaction = new Transaction(firstDate, 5, 'CREDIT');
             expect(transaction.timestamp).toEqual(firstDate);
 
             // jasmine.clock().uninstall();
