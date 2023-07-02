@@ -4,6 +4,25 @@ This challenge helps you practice your OO design skills.
 
 You'll work alone, and you'll also review your own code so you can practice reflecting on and improving your own work.
 
+## Installation
+
+Use the package manager [npm](https://docs.npmjs.com/cli/v9/commands/npm-install) to install dependencies.
+```
+npm install
+```
+
+## To run the tests
+After installing the dependencies, you can run the test suites from your project root directory: 
+```
+npm test
+```
+
+## Usage
+You can run the programme from the project root directory by running
+```
+cd src/ && node index.js
+```
+
 ## Explanation
 
 ### User story 1
@@ -112,28 +131,9 @@ I want the bank statement to be printed neatly.
 Tests: 
 <ul>
     <li>Check that it has the right paddings</li>
-    <li>Check that it has the right colours for debit and credit amount</li>
+    <li>Check that it has the right colours for debit/credit amount and balance</li>
 </ul>
 
-
-
-## Installation
-Use the package manager [npm](https://docs.npmjs.com/cli/v9/commands/npm-install) to install dependencies.
-```
-npm install
-```
-
-## To run the tests
-After installing the dependencies, you can run the test suites from your project root directory: 
-```
-npm test
-```
-
-## Usage
-You can run the programme from the project root directory by running
-```
-cd src/ && node index.js
-```
 
 ## Specification
 
@@ -172,3 +172,7 @@ date       || credit  || debit  || balance
 - [ ] Can you format the console output?  Credited values should be GREEN and debited values should be RED.  The balance should be GREEN if positive and RED if negative
 
 You may find this link useful [Output to the command line using NodeJS](https://nodejs.dev/en/learn/output-to-the-command-line-using-nodejs/) - check the formatting section (and this links out to a GitHub doc on the [ANSI color codes](https://gist.github.com/iamnewton/8754917))
+
+#### Note
+
+I have received help from StackOverflow and my husband. 
