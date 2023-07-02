@@ -130,9 +130,9 @@ npm test
 ```
 
 ## Usage
-You can run the programme from the project root directory by using
+You can run the programme from the project root directory by running
 ```
-node index.js
+cd src/ && node index.js
 ```
 
 ## Specification

@@ -1,7 +1,11 @@
-import Statement from '../src/Statement.js';
+import Statement, {
+    reverseChronologicalOrder,
+    RED_ANSI,
+    GREEN_ANSI,
+} from '../src/Statement.js';
 
 describe('Statement Class Tests', () => {
-    let consoleLogSpy, printHeaderSpy;
+    let consoleLogSpy;
 
     const mockAccount = {
         currentBalance: 2400,
@@ -15,7 +19,6 @@ describe('Statement Class Tests', () => {
     describe('When printing', () => {
         beforeEach(() => {
             consoleLogSpy = spyOn(console, 'log');
-            printHeaderSpy = spyOn(Statement, 'printHeader');
         });
 
         it('should return an error if an array was not passed as an argument', () => {
@@ -27,105 +30,112 @@ describe('Statement Class Tests', () => {
         it('should print the header first', () => {
             Statement.print(mockAccount);
 
-            expect(printHeaderSpy).toHaveBeenCalled();
+            expect(consoleLogSpy.calls.argsFor(0)[0]).toBe(
+                'date       || credit       || debit        || balance     '
+            );
         });
 
-        it('should console.log all transactions', () => {
+        it('should print all transactions in reverse chronological order', () => {
             Statement.print(mockAccount);
 
+            // no. of transactions + header row
             expect(consoleLogSpy).toHaveBeenCalledTimes(
-                mockAccount.transactions.length
+                mockAccount.transactions.length + 1
+            );
+
+            expect(consoleLogSpy.calls.argsFor(1)[0]).toContain('25/01/2021');
+            expect(consoleLogSpy.calls.argsFor(2)[0]).toContain('20/01/2021');
+            expect(consoleLogSpy.calls.argsFor(3)[0]).toContain('10/01/2021');
+        });
+
+        it('should print debit columns in red', () => {
+            Statement.print(mockAccount);
+            expect(consoleLogSpy.calls.argsFor(1)[0]).toContain(RED_ANSI);
+            expect(consoleLogSpy.calls.argsFor(2)[0]).toContain(
+                `${RED_ANSI}1000.00`
+            );
+            expect(consoleLogSpy.calls.argsFor(3)[0]).toContain(RED_ANSI);
+        });
+
+        it('should print credit columns in green', () => {
+            Statement.print(mockAccount);
+            expect(consoleLogSpy.calls.argsFor(1)[0]).toContain(
+                `${GREEN_ANSI}3000.00`
+            );
+            expect(consoleLogSpy.calls.argsFor(2)[0]).toContain(GREEN_ANSI);
+            expect(consoleLogSpy.calls.argsFor(3)[0]).toContain(
+                `${GREEN_ANSI}400.00`
+            );
+        });
+
+        it('should print balance columns in green if it is positive, and red otherwise', () => {
+            Statement.print(mockAccount);
+            expect(consoleLogSpy.calls.argsFor(1)[0]).toContain(
+                `${GREEN_ANSI}2400.00`
+            );
+            expect(consoleLogSpy.calls.argsFor(2)[0]).toContain(
+                `${RED_ANSI}-600.00`
+            );
+            expect(consoleLogSpy.calls.argsFor(3)[0]).toContain(
+                `${GREEN_ANSI}400.00`
             );
         });
     });
 
-    describe('When calculating balance for each transaction', () => {
-        it('should get account current balance for latest transaction', () => {
-            let sortedTransactions = Statement.sortTransactions(
-                mockAccount.transactions
-            );
+    describe('When calculating balances for a transaction', () => {
+        it('should equal the previous balance less any debit and plus any credit', () => {
+            const chronologicalStatementRows = Statement.getStatementRows(
+                mockAccount
+            ).sort((a, b) => a.date - b.date);
 
-            let balanceArr = Statement.getTransactionBalance(
-                mockAccount.currentBalance,
-                sortedTransactions
-            );
-
-            expect(balanceArr[0]).toBe(mockAccount.currentBalance);
+            chronologicalStatementRows.slice(1).forEach((row, prevRowIdx) => {
+                const prevRow = chronologicalStatementRows[prevRowIdx];
+                expect(row.balance).toBe(
+                    prevRow.balance - row.debit + row.credit
+                );
+            });
         });
 
-        it('should get oldest transaction amount as oldest transaction balance', () => {
-            let sortedTransactions = Statement.sortTransactions(
-                mockAccount.transactions
+        it('the final balance should equal the account current balance', () => {
+            const chronologicalStatementRows = Statement.getStatementRows(
+                mockAccount
+            ).sort((a, b) => a.date - b.date);
+
+            expect(chronologicalStatementRows.slice(-1)[0].balance).toBe(
+                mockAccount.currentBalance
             );
-
-            let balanceArr = Statement.getTransactionBalance(
-                mockAccount.currentBalance,
-                sortedTransactions
-            );
-
-            expect(balanceArr.at(-1)).toBe(sortedTransactions.at(-1).amount);
-        });
-    });
-
-    describe('When formatting transactions array', () => {
-        const RED_ANSI = '\x1b[0;31m';
-        const GREEN_ANSI = '\x1b[0;32m';
-        let sortedTransactions, balanceArr;
-
-        beforeEach(() => {
-            sortedTransactions = Statement.sortTransactions(
-                mockAccount.transactions
-            );
-
-            balanceArr = Statement.getTransactionBalance(
-                mockAccount.currentBalance,
-                sortedTransactions
-            );
-        });
-
-        it('should return array of strings', () => {
-            let formattedArr = Statement.formatTransactions(
-                balanceArr,
-                sortedTransactions
-            );
-
-            expect(formattedArr.length).toBe(mockAccount.transactions.length);
-            expect(formattedArr[0]).toContain('2400');
-        });
-
-        it('should return formatted strings with ANSI colour code', () => {
-            let formattedArr = Statement.formatTransactions(
-                balanceArr,
-                sortedTransactions
-            );
-
-            expect(formattedArr[0]).toContain(GREEN_ANSI);
-            expect(formattedArr[1]).toContain(RED_ANSI);
         });
     });
 
     describe('When sorting transactions', () => {
         it('should sort transaction to be newest to oldest transactions', () => {
-            let sortedArr = Statement.sortTransactions(
-                mockAccount.transactions
-            );
-            expect(sortedArr[0].timestamp).toEqual(new Date('2021-01-25'));
+            expect(
+                mockAccount.transactions.sort(reverseChronologicalOrder)[0]
+                    .timestamp
+            ).toEqual(new Date('2021-01-25'));
         });
     });
 
-    describe('When printing the header', () => {
-        beforeEach(() => {
-            consoleLogSpy = spyOn(console, 'log');
+    describe('Format transaction details', () => {
+        it('should return a date string with a reset ANSI colour code when given a Date object', () => {
+            const date = new Date('2012-01-10');
+            expect(Statement.formatDate(date)).toContain('\x1b[0m10/01/2012');
         });
 
-        it('should call console.log', () => {
-            Statement.printHeader();
-
-            expect(consoleLogSpy).toHaveBeenCalled();
+        it('should return a string with red ANSI colour code when formatting the debit amount', () => {
+            expect(Statement.formatDebit(500)).toContain('\x1b[0;31m500');
         });
-    });
 
-    it('should return a date string when given a Date object', () => {
-        expect(Statement.formatDate(new Date('2012-01-10'))).toBe('10/01/2012');
+        it('should return a string with green ANSI colour code when formatting the credit amount', () => {
+            expect(Statement.formatCredit(500)).toContain('\x1b[0;32m500');
+        });
+
+        it('should return a string with green ANSI colour code when formatting a non-negative balance', () => {
+            expect(Statement.formatBalance(0)).toContain('\x1b[0;32m0');
+        });
+
+        it('should return a string with red ANSI colour code when formatting a negative balance', () => {
+            expect(Statement.formatBalance(-100)).toContain('\x1b[0;31m-100');
+        });
     });
 });

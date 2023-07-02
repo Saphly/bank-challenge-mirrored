@@ -1,141 +1,96 @@
+const SEPARATOR = ' || ';
+const DATE_COL_WIDTH = '10/10/2021'.length;
+const NUMERIC_COL_WIDTH = '100000000.00'.length;
+const RESET_ANSI = '\x1b[0m';
+export const RED_ANSI = '\x1b[0;31m';
+export const GREEN_ANSI = '\x1b[0;32m';
+
+// See https://stackoverflow.com/questions/10123953/how-to-sort-an-object-array-by-date-property
+export const reverseChronologicalOrder = (a, b) => b.timestamp - a.timestamp;
+
 class Statement {
-    static colSeparator = ' || ';
-
-    // Not enough time to make it dynamic
-    static getColumnWidth = () => {
-        return {
-            dateColumn: '10/10/2021'.length,
-            others: '100000000.00'.length,
-        };
-    };
-
     static printHeader = () => {
-        const headerArray = ['date', 'credit', 'debit', 'balance'];
-        const colWidths = this.getColumnWidth();
-
-        let printArr = [];
-
-        headerArray.forEach((element) => {
-            let newElement = element.padEnd(
-                element === 'date' ? colWidths.dateColumn : colWidths.others
-            );
-
-            printArr = [...printArr, newElement];
-        });
-
-        console.log(printArr.join(this.colSeparator));
+        const formattedHeaders = ['date', 'credit', 'debit', 'balance'].map(
+            (header) =>
+                header.padEnd(
+                    header === 'date' ? DATE_COL_WIDTH : NUMERIC_COL_WIDTH
+                )
+        );
+        console.log(formattedHeaders.join(SEPARATOR));
     };
 
     static print = (account) => {
         if (!account || account.transactions.length === 0)
             throw new Error('Transactions not provided');
 
-        const sortedTransactions = this.sortTransactions(account.transactions);
-        const transactionBalances = this.getTransactionBalance(
-            account.currentBalance,
-            sortedTransactions
-        );
-        const formattedTransactions = this.formatTransactions(
-            transactionBalances,
-            sortedTransactions
-        );
+        const statementRows = this.getStatementRows(account);
+        const formattedStatementRows = this.formatStatementRows(statementRows);
+
         this.printHeader();
-        formattedTransactions.forEach((transaction) => {
-            console.log(transaction);
+        formattedStatementRows.forEach((row) => {
+            console.log(row);
         });
     };
 
-    static formatTransactions = (balanceArray, sortedTransactions) => {
-        const RESET_ANSI = '\x1b[0m';
-        const RED_ANSI = '\x1b[0;31m';
-        const GREEN_ANSI = '\x1b[0;32m';
-        const colWidths = this.getColumnWidth();
-        let formattedTransactions = [];
+    static getStatementRows = (account) => {
+        const reverseChronologicalTransactions = account.transactions.sort(
+            reverseChronologicalOrder
+        );
 
-        for (let i = 0; i < sortedTransactions.length; i++) {
-            let transaction = sortedTransactions[i];
-            let transactionString = '';
-            let balanceColour = balanceArray[i] >= 0 ? GREEN_ANSI : RED_ANSI;
+        let remainingBalance = account.currentBalance;
+        let statementRows = [];
 
-            transactionString = this.formatDate(transaction.timestamp)
-                .padEnd(colWidths.dateColumn)
-                .concat(this.colSeparator);
+        reverseChronologicalTransactions.forEach((trx) => {
+            const credit = trx.type === 'CREDIT' ? trx.amount : 0;
+            const debit = trx.type === 'DEBIT' ? trx.amount : 0;
+            let statementRow = {
+                date: trx.timestamp,
+                credit,
+                debit,
+                balance: remainingBalance,
+            };
+            statementRows = [...statementRows, statementRow];
+            remainingBalance += debit - credit;
+        });
 
-            if (transaction.type === 'DEBIT') {
-                transactionString = transactionString.concat(
-                    ''.padEnd(colWidths.others),
-                    this.colSeparator
-                );
-
-                transactionString = transactionString.concat(
-                    RED_ANSI,
-                    transaction.amount.toFixed(2).padEnd(colWidths.others),
-                    RESET_ANSI,
-                    this.colSeparator
-                );
-            } else {
-                transactionString = transactionString.concat(
-                    GREEN_ANSI,
-                    transaction.amount.toFixed(2).padEnd(colWidths.others),
-                    RESET_ANSI,
-                    this.colSeparator
-                );
-
-                transactionString = transactionString.concat(
-                    ''.padEnd(colWidths.others),
-                    this.colSeparator
-                );
-            }
-
-            transactionString = transactionString.concat(
-                balanceColour,
-                balanceArray[i].toFixed(2),
-                RESET_ANSI
-            );
-
-            formattedTransactions = [
-                ...formattedTransactions,
-                transactionString,
-            ];
-        }
-
-        return formattedTransactions;
+        return statementRows;
     };
 
-    static getTransactionBalance = (accountBalance, sortedTransactions) => {
-        let remainingBalance = accountBalance;
-
-        return sortedTransactions.slice(0, -1).reduce(
-            (balances, transaction) => {
-                if (transaction.type === 'DEBIT') {
-                    remainingBalance += transaction.amount;
-                } else {
-                    remainingBalance -= transaction.amount;
-                }
-                return [...balances, remainingBalance];
-            },
-            [remainingBalance]
+    static formatStatementRows = (statementRows) => {
+        return statementRows.map((row) =>
+            [
+                this.formatDate(row.date),
+                this.formatCredit(row.credit),
+                this.formatDebit(row.debit),
+                this.formatBalance(row.balance),
+            ].join(`${RESET_ANSI}${SEPARATOR}`)
         );
     };
 
-    // Implemented from
-    // https://stackoverflow.com/questions/10123953/how-to-sort-an-object-array-by-date-property
-    static sortTransactions = (transactionArray) => {
-        let sortedArray = [...transactionArray];
-
-        sortedArray.sort((a, b) => {
-            return new Date(b.timestamp) - new Date(a.timestamp);
-        });
-
-        return sortedArray;
-    };
-
-    static formatDate = (dateObj) =>
-        dateObj.toLocaleString('en-GB', {
+    static formatDate = (dateObj) => {
+        let formattedDate = dateObj.toLocaleString('en-GB', {
             year: 'numeric',
             month: 'numeric',
             day: 'numeric',
         });
+        return `${RESET_ANSI}${formattedDate.padEnd(DATE_COL_WIDTH)}`;
+    };
+
+    static formatDebit = (debitAmount) => {
+        let formattedAmount = debitAmount === 0 ? '' : debitAmount.toFixed(2);
+        return `${RED_ANSI}${formattedAmount.padEnd(NUMERIC_COL_WIDTH)}`;
+    };
+
+    static formatCredit = (creditAmount) => {
+        let formattedAmount = creditAmount === 0 ? '' : creditAmount.toFixed(2);
+        return `${GREEN_ANSI}${formattedAmount.padEnd(NUMERIC_COL_WIDTH)}`;
+    };
+
+    static formatBalance = (balance) => {
+        return `${balance < 0 ? RED_ANSI : GREEN_ANSI}${balance
+            .toFixed(2)
+            .padEnd(NUMERIC_COL_WIDTH)}`;
+    };
 }
 
 export default Statement;
