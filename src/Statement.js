@@ -1,27 +1,29 @@
 class Statement {
     static colSeparator = ' || ';
 
+    // Not enough time to make it dynamic
+    static getColumnWidth = () => {
+        return {
+            dateColumn: '10/10/2021'.length,
+            others: '100000000.00'.length,
+        };
+    };
+
     static printHeader = () => {
-        const colWidths = this.getColumnWidth();
         const headerArray = ['date', 'credit', 'debit', 'balance'];
+        const colWidths = this.getColumnWidth();
 
-        let printString = '';
+        let printArr = [];
 
-        for (let i = 0; i < headerArray.length; i++) {
-            let element = '';
+        headerArray.forEach((element) => {
+            let newElement = element.padEnd(
+                element === 'date' ? colWidths.dateColumn : colWidths.others
+            );
 
-            if (headerArray[i] === 'date') {
-                element = headerArray[i].padEnd(colWidths.dateColumn);
-            } else {
-                element = headerArray[i].padEnd(colWidths.others);
-            }
+            printArr = [...printArr, newElement];
+        });
 
-            if (i !== headerArray.length - 1)
-                element = element.concat(this.colSeparator);
-            printString = printString.concat(element);
-        }
-
-        console.log(printString);
+        console.log(printArr.join(this.colSeparator));
     };
 
     static print = (account) => {
@@ -134,14 +136,6 @@ class Statement {
             month: 'numeric',
             day: 'numeric',
         });
-
-    // Not enough time to make it dynamic
-    static getColumnWidth = () => {
-        return {
-            dateColumn: '10/10/2021'.length,
-            others: '100000000.00'.length,
-        };
-    };
 }
 
 export default Statement;
